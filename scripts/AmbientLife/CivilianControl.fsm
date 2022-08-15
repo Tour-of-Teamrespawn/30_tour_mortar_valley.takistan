@@ -1,0 +1,355 @@
+/*%FSM<COMPILE "C:\Program Files (x86)\Steam\steamapps\common\Arma 3 Tools\FSMEditor\scriptedFSM.cfg, civilianControl">*/
+/*%FSM<HEAD>*/
+/*
+item0[] = {"Start",0,250,82.253479,-247.581390,172.253479,-197.581390,0.000000,"Start"};
+item1[] = {"End_",1,4346,-264.287537,-247.549606,-174.287537,-197.549652,0.000000,"End" \n ""};
+item2[] = {"unitReady",4,218,82.824799,-153.412231,172.824799,-103.412231,0.000000,"unitReady"};
+item3[] = {"_",4,218,-122.406982,-156.165649,-32.406982,-106.165649,0.000000,""};
+item4[] = {"",7,210,23.643768,-47.031647,31.643768,-39.031647,0.000000,""};
+item5[] = {"",7,210,23.918579,-133.654083,31.918579,-125.654083,0.000000,""};
+item6[] = {"_",2,250,83.957001,-67.432800,173.957016,-17.432800,0.000000,""};
+item7[] = {"",7,210,23.215088,-224.404068,31.215088,-216.404068,0.000000,""};
+item8[] = {"__1",4,218,-121.214394,-246.486984,-31.214386,-196.486984,0.000000,""};
+item9[] = {"__1",2,250,-122.346527,-66.635895,-32.346512,-16.635895,0.000000,""};
+item10[] = {"__2",4,218,-119.653503,24.645950,-29.653503,74.645950,0.000000,""};
+item11[] = {"__2",2,250,-120.718048,117.050171,-30.718033,167.050171,0.000000,""};
+item12[] = {"",7,210,23.643768,138.369110,31.643768,146.369110,0.000000,""};
+item13[] = {"__2",4,218,-119.250000,211.012650,-29.250000,261.012634,0.000000,""};
+item14[] = {"__3",2,250,-121.803711,310.293335,-31.803696,360.293335,0.000000,""};
+item15[] = {"",7,210,20.386932,333.783600,28.386932,341.783600,0.000000,""};
+item16[] = {"",7,210,24.769165,45.939240,32.769165,53.939240,0.000000,""};
+item17[] = {"",7,210,22.597839,235.925476,30.597839,243.925476,0.000000,""};
+link0[] = {0,2};
+link1[] = {0,7};
+link2[] = {2,6};
+link3[] = {3,9};
+link4[] = {4,5};
+link5[] = {5,2};
+link6[] = {5,3};
+link7[] = {5,7};
+link8[] = {6,4};
+link9[] = {7,8};
+link10[] = {8,1};
+link11[] = {9,4};
+link12[] = {9,10};
+link13[] = {10,11};
+link14[] = {11,12};
+link15[] = {11,13};
+link16[] = {12,16};
+link17[] = {13,14};
+link18[] = {14,15};
+link19[] = {15,17};
+link20[] = {16,4};
+link21[] = {17,12};
+globals[] = {0.000000,0,0,0,0,640,480,1,21,6316128,1,-584.615051,584.614746,558.016785,-445.110657,1077,924,1};
+window[] = {2,-1,-1,-1,-1,919,130,1570,130,3,1095};
+*//*%FSM</HEAD>*/
+class FSM
+{
+        fsmName = "civilianControl";
+        class States
+        {
+                /*%FSM<STATE "Start">*/
+                class Start
+                {
+                        name = "Start";
+                        itemno = 0;
+                        init = /*%FSM<STATEINIT""">*/"private [""_unit"", ""_posArray"", ""_time""];" \n
+                         "" \n
+                         "_unit = _this select 0;" \n
+                         "_posArray = _this select 1;" \n
+                         "" \n
+                         "_unit removeEventHandler [""FiredNear"", 0];"/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "_">*/
+                                class _
+                                {
+                                        itemno = 8;
+                                        priority = 0.000000;
+                                        to="End_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"isNUll _unit || !alive _unit"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "unitReady">*/
+                                class unitReady
+                                {
+                                        itemno = 2;
+                                        priority = 0.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"unitReady _unit && (isNil {_unit getVariable ""TDMC_civ_fNear""})"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "End_">*/
+                class End_
+                {
+                        name = "End_";
+                        itemno = 1;
+                        init = /*%FSM<STATEINIT""">*/""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "_">*/
+                class _
+                {
+                        name = "_";
+                        itemno = 6;
+                        init = /*%FSM<STATEINIT""">*/"_unit addEventHandler [""FiredNear"", " \n
+                         "{" \n
+                         "	(_this select 0) setVariable [""TDMC_civ_fNear"", 1, false];" \n
+                         "	(_this select 0) removeEventHandler [""FiredNear"", _thisEventHandler];" \n
+                         "}];" \n
+                         "" \n
+                         "_unit setSpeedMode ""LIMITED"";" \n
+                         "_unit enableAi ""TARGET"";" \n
+                         "_unit enableAi ""AUTOTARGET"";" \n
+                         "_unit setBehaviour ""SAFE"";" \n
+                         "_unit enableAI ""MOVE"";" \n
+                         "_unit setUnitPos ""UP"";" \n
+                         "_unit doMove (_posArray select ( floor (random (count _posArray))));"/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "_">*/
+                                class _
+                                {
+                                        itemno = 3;
+                                        priority = 0.000000;
+                                        to="__1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil {_unit getVariable ""TDMC_civ_fNear""}" \n
+                                         "&&" \n
+                                         "((_unit getVariable ""TDMC_civ_fNear"") == 1)"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "__1">*/
+                                class __1
+                                {
+                                        itemno = 8;
+                                        priority = 0.000000;
+                                        to="End_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"isNUll _unit || !alive _unit"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "unitReady">*/
+                                class unitReady
+                                {
+                                        itemno = 2;
+                                        priority = 0.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"unitReady _unit && (isNil {_unit getVariable ""TDMC_civ_fNear""})"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "__1">*/
+                class __1
+                {
+                        name = "__1";
+                        itemno = 9;
+                        init = /*%FSM<STATEINIT""">*/"if (random 2 < 1) then" \n
+                         "{" \n
+                         "	_unit setUnitPos ""MIDDLE"";" \n
+                         "}else" \n
+                         "{" \n
+                         "	_unit setUnitPos ""DOWN"";" \n
+                         "};" \n
+                         "_time = time + 5;" \n
+                         "_unit setBehaviour ""CARELESS"";" \n
+                         "_unit disableAi ""MOVE"";" \n
+                         "_unit disableAi ""TARGET"";" \n
+                         "_unit disableAi ""AUTOTARGET"";" \n
+                         "_unit allowFleeing 0;" \n
+                         "_unit setVariable [""TDMC_civ_fNear"", 2, false];"/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "unitReady">*/
+                                class unitReady
+                                {
+                                        itemno = 2;
+                                        priority = 0.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"unitReady _unit && (isNil {_unit getVariable ""TDMC_civ_fNear""})"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "_">*/
+                                class _
+                                {
+                                        itemno = 3;
+                                        priority = 0.000000;
+                                        to="__1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil {_unit getVariable ""TDMC_civ_fNear""}" \n
+                                         "&&" \n
+                                         "((_unit getVariable ""TDMC_civ_fNear"") == 1)"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "__1">*/
+                                class __1
+                                {
+                                        itemno = 8;
+                                        priority = 0.000000;
+                                        to="End_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"isNUll _unit || !alive _unit"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "__2">*/
+                                class __2
+                                {
+                                        itemno = 10;
+                                        priority = 0.000000;
+                                        to="__2";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"(_time < time)"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "__2">*/
+                class __2
+                {
+                        name = "__2";
+                        itemno = 11;
+                        init = /*%FSM<STATEINIT""">*/"_unit enableAI ""MOVE"";" \n
+                         "_unit disableAi ""TARGET"";" \n
+                         "_time = time + 120;" \n
+                         "_unit setVariable [""TDMC_civ_fNear"", 3, false];" \n
+                         "_unit setUnitPos ""UP"";" \n
+                         "_unit doMove (_unit getpos [50, (random 360)]);" \n
+                         "_unit setSpeedMode ""FULL"";"/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "unitReady">*/
+                                class unitReady
+                                {
+                                        itemno = 2;
+                                        priority = 0.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"unitReady _unit && (isNil {_unit getVariable ""TDMC_civ_fNear""})"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "_">*/
+                                class _
+                                {
+                                        itemno = 3;
+                                        priority = 0.000000;
+                                        to="__1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil {_unit getVariable ""TDMC_civ_fNear""}" \n
+                                         "&&" \n
+                                         "((_unit getVariable ""TDMC_civ_fNear"") == 1)"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "__1">*/
+                                class __1
+                                {
+                                        itemno = 8;
+                                        priority = 0.000000;
+                                        to="End_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"isNUll _unit || !alive _unit"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "__2">*/
+                                class __2
+                                {
+                                        itemno = 13;
+                                        priority = 0.000000;
+                                        to="__3";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"(moveToCompleted _unit)||(moveToFailed _unit)||(_time < time)"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "__3">*/
+                class __3
+                {
+                        name = "__3";
+                        itemno = 14;
+                        init = /*%FSM<STATEINIT""">*/"_unit enableAi ""TARGET"";" \n
+                         "_unit enableAi ""AUTOTARGET"";" \n
+                         "_unit setBehaviour ""SAFE"";" \n
+                         "_unit setUnitPos ""UP"";" \n
+                         "_unit setVariable [""TDMC_civ_fNear"", nil];"/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "_">*/
+                                class _
+                                {
+                                        itemno = 3;
+                                        priority = 0.000000;
+                                        to="__1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil {_unit getVariable ""TDMC_civ_fNear""}" \n
+                                         "&&" \n
+                                         "((_unit getVariable ""TDMC_civ_fNear"") == 1)"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "__1">*/
+                                class __1
+                                {
+                                        itemno = 8;
+                                        priority = 0.000000;
+                                        to="End_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"isNUll _unit || !alive _unit"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "unitReady">*/
+                                class unitReady
+                                {
+                                        itemno = 2;
+                                        priority = 0.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"unitReady _unit && (isNil {_unit getVariable ""TDMC_civ_fNear""})"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+        };
+        initState="Start";
+        finalStates[] =
+        {
+                "End_",
+        };
+};
+/*%FSM</COMPILE>*/

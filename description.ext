@@ -1,0 +1,118 @@
+class Header
+{
+	gameType = Coop;
+	minPlayers = 1;
+	maxPlayers = 30; 
+};
+
+author = "Mr.Ben";
+onLoadName = "30 [TOUR] Mortar Valley V"; 
+briefingName = "30 [TOUR] Mortar Valley V"
+onLoadMission = "Eliminate Those Damn Mortar Positions!";
+onLoadMissionTime = true;
+overviewPicture = "";
+loadScreen = "img\mValley.paa"; //Loading screen picture, should be 1024x512 pixels in .paa format.
+enableItemsDropping = 0;
+disabledAI = true; 
+enableDebugConsole = 1;
+
+respawn = 3;
+respawnDelay = 30;
+respawnDialog = 1;
+respawnTemplates[] = {"tickets"};
+respawnVehicleDelay = 30;
+
+#include "scripts\TOUR_IED\dlg\bombDefuseDlg.hpp"
+#include "scripts\TOUR_RC\dialog\hpp\admintool.hpp"
+#include "scripts\TOUR_SI\interface\hpp\interface.hpp"
+
+class Params
+{
+	class TOUR_param_Respawn
+	{
+		//paramsArray[0]
+		title = "Respawn Time (s):";
+		values[] = {0, 30, 60, 300, 600, 900};
+		default = 30;
+		texts[] = {"None", "30 Seconds", "1 Minute", "5 Minutes", "10 Minutes", "15 Minutes"};
+	};
+	
+	class TOUR_param_tickets
+	{
+		//paramsArray[1]
+		title = "Lives:";
+		values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 100};
+		default = 1;
+		texts[] = {"1", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "20", "30", "40", "50", "100"};
+	};
+};
+
+class CfgDebriefing
+{
+	class complete
+	{
+		title = "Mission Success";
+		subtitle = "Mortars Eliminated";
+		description = "You have successfully disabled all the mortar positions.";
+		pictureBackground = "img\USFlag.paa";
+		picture = "b_inf";
+		pictureColor[] = { 0.0, 0.3, 0.6, 1 };
+	};
+	class partial
+	{
+		title = "Mission Partial Success";
+		subtitle = "Civilian Casulaties";
+		description = "You have successfully disabled all the mortar positions, but civilians casulaties occured during the operation.";
+		pictureBackground = "img\USFlag.paa";
+		picture = "b_inf";
+		pictureColor[] = { 0.0, 0.3, 0.6, 1 };
+	};
+	class failed
+	{
+		title = "Mission Failure";
+		subtitle = "Mission Aborted";
+		description = "You were unable destroy all the mortar positions.";
+		pictureBackground = "\ca\ca_E\data\flag_tka_co.paa";
+		picture = "o_inf";
+		pictureColor[] = { 0.6,0.1,0.2,1 };
+	};
+	class kia
+	{
+		title = "Mission Failure";
+		subtitle = "KIA";
+		description = "All teammates were killed in action.";
+		pictureBackground = "\ca\ca_E\data\flag_tka_co.paa";
+		picture = "o_inf";
+		pictureColor[] = { 0.6,0.1,0.2,1 };
+	};
+};
+
+class CfgRadio
+{
+	sounds[] = {};
+
+	class TOUR_SI_chatRTB
+	{
+	   name = "TOUR_SI_chatRTB";
+	   sound[] = {};
+	   title = "Hey pilot, we need to RTB!";
+	};
+};
+
+class CfgSounds
+{
+	sounds[] = {};
+   
+	class TOUR_key_noise
+	{
+		name = "TOUR_key_noise";
+		sound[] = {"sounds\TOUR_key_noise.wav", 1, 1};
+		titles[] = {};
+	};
+	class TOUR_introMusic
+	{
+		name = "TOUR_introMusic";
+		sound[] = {"sounds\TOUR_introMusic.ogg", 1, 1};
+		titles[] = {};
+	};
+};

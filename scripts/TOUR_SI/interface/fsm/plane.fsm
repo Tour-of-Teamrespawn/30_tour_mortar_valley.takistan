@@ -1,0 +1,968 @@
+/*%FSM<COMPILE "scriptedFSM.cfg, plane">*/
+/*%FSM<HEAD>*/
+/*
+item0[] = {"react",0,250,-245.101746,42.579651,-155.101776,92.579651,0.000000,"react"};
+item1[] = {"killed",4,218,-392.193604,40.281387,-302.193542,90.281387,50.000000,"killed"};
+item2[] = {"end1",1,250,-563.247559,36.338539,-473.247559,86.338524,0.000000,"end1"};
+item3[] = {"New_Task",4,4314,-247.841156,134.887253,-157.841156,184.887253,10.000000,"New Task"};
+item4[] = {"_",2,250,-247.670059,232.022171,-157.670044,282.022156,0.000000,""};
+item5[] = {"",7,210,-352.023285,252.243286,-344.023285,260.243286,0.000000,""};
+item6[] = {"",7,210,-351.364258,154.799698,-343.364258,162.799698,0.000000,""};
+item7[] = {"circle",4,218,-102.420647,518.764648,-12.420685,568.764648,0.000000,"circle"};
+item8[] = {"SAD",4,218,-103.236488,321.138245,-13.236481,371.138245,0.000000,"SAD"};
+item9[] = {"__1",2,250,-105.217743,411.100220,-15.217743,461.100220,0.000000,""};
+item10[] = {"",7,210,-351.934448,432.637787,-343.934448,440.637787,0.000000,""};
+item11[] = {"RTB",4,218,-247.684219,325.038177,-157.684189,375.038177,0.000000,"RTB"};
+item12[] = {"__2",2,250,-250.921677,411.818542,-160.921646,461.818542,0.000000,""};
+item13[] = {"move",4,218,41.802490,312.884369,131.802582,362.884369,0.000000,"move"};
+item14[] = {"__3",2,250,41.390594,410.896698,131.390594,460.896698,0.000000,""};
+item15[] = {"at_position",4,218,41.390625,515.649170,131.390625,565.649414,0.000000,"at position"};
+item16[] = {"__4",2,250,41.216553,633.428101,131.216553,683.428101,0.000000,""};
+item17[] = {"",7,210,-354.531738,661.199829,-346.531738,669.199829,0.000000,""};
+item18[] = {"Service",4,218,-249.971558,508.665466,-159.971558,558.665527,10.000000,"Service"};
+link0[] = {0,1};
+link1[] = {0,3};
+link2[] = {1,2};
+link3[] = {3,4};
+link4[] = {4,5};
+link5[] = {4,8};
+link6[] = {4,11};
+link7[] = {4,13};
+link8[] = {5,6};
+link9[] = {6,1};
+link10[] = {6,3};
+link11[] = {7,9};
+link12[] = {8,9};
+link13[] = {9,7};
+link14[] = {9,10};
+link15[] = {10,5};
+link16[] = {11,12};
+link17[] = {12,10};
+link18[] = {12,18};
+link19[] = {13,14};
+link20[] = {14,10};
+link21[] = {14,15};
+link22[] = {15,16};
+link23[] = {16,17};
+link24[] = {17,10};
+link25[] = {18,12};
+globals[] = {0.000000,0,0,0,0,640,480,1,78,6316128,1,-743.325439,447.236053,847.524902,-314.121216,946,924,1};
+window[] = {2,-1,-1,-1,-1,757,2568,3828,20,3,964};
+*//*%FSM</HEAD>*/
+class FSM
+{
+        fsmName = "plane";
+        class States
+        {
+                /*%FSM<STATE "react">*/
+                class react
+                {
+                        name = "react";
+                        itemno = 0;
+                        init = /*%FSM<STATEINIT""">*/"private " \n
+                         "[" \n
+                         "	""_veh"", ""_grp"", ""_callsign"", ""_pos"", ""_airport"", ""_taskArray"", ""_task"", ""_posCircle"", ""_dirCas"", ""_posCas"", ""_radiusCas""," \n
+                         "	""_flyInHeight"", ""_h"", ""_posIn"", ""_target"", ""_base"", ""_fuel"", ""_damage"", ""_add"", ""_time""" \n
+                         "];" \n
+                         "_veh = _this select 0;" \n
+                         "_grp = _this select 1;" \n
+                         "_callsign = _this select 2;" \n
+                         "_base = _this select 3;" \n
+                         "_airport = _this select 4;" \n
+                         "_taskArray = [];" \n
+                         "_task = ""idle"";" \n
+                         "_posCircle = [];" \n
+                         "_dirCas = 0;" \n
+                         "_posCas = [];" \n
+                         "_radiusCas = 500;" \n
+                         "_height = 200;" \n
+                         "_h = createVehicle [""Land_HelipadEmpty_F"", _base, [], 0, ""CAN_COLLIDE""];" \n
+                         "_fuel = 1;" \n
+                         "//_posIn = [];" \n
+                         "_target = objNull;" \n
+                         "_time = time;" \n
+                         "" \n
+                         "_veh lockDriver true;" \n
+                         "_veh lock true;" \n
+                         "{" \n
+                         "	_x setSkill 1;" \n
+                         "	_x allowFleeing 0;" \n
+                         "} forEach units _grp;" \n
+                         "" \n
+                         "//Vehicle Status" \n
+                         "_veh setVariable [""TOUR_SI_unitStatus"", ""idle"", true];" \n
+                         "" \n
+                         "if (_veh isKindOf ""air"") then " \n
+                         "{ " \n
+                         "	_veh setVariable [""TOUR_SI_unitFuel"", (fuel _veh), false];" \n
+                         "	_veh setFuel 0;" \n
+                         "	_veh addEventHandler [""LandedStopped"", " \n
+                         "	{" \n
+                         "		if (!local (_this select 0)) exitWith {};" \n
+                         "		if (((_this select 0) getVariable ""TOUR_SI_unitStatus"") == ""idle"") exitWith {};" \n
+                         "		" \n
+                         "		private [""_veh"", ""_airport""];" \n
+                         "		_veh = _this select 0;" \n
+                         "		_airport = _this select 1;" \n
+                         "		_veh spawn 	{" \n
+                         "								sleep 15;" \n
+                         "								_this setVariable [""TOUR_SI_unitfuel"", fuel _this, false];" \n
+                         "								_this setFuel 0;" \n
+                         "								_this setVariable [""TOUR_SI_unitStatus"", ""servicing"", true];" \n
+                         "						};" \n
+                         "		" \n
+                         "		[_veh, ""We are at base. OUT"", ""side""] call TOUR_SI_fnc_broadcastmessage;" \n
+                         "	}];" \n
+                         "};" \n
+                         ""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "killed">*/
+                                class killed
+                                {
+                                        itemno = 1;
+                                        priority = 50.000000;
+                                        to="end1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"(!alive _veh" \n
+                                         "||" \n
+                                         "((!canMove _veh)&&(fuel _veh > 0))" \n
+                                         "||" \n
+                                         "!alive driver _veh)" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""NEO_radioCasUnitStatus"", ""KILLED"", true];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "New_Task">*/
+                                class New_Task
+                                {
+                                        itemno = 3;
+                                        priority = 10.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil { _veh getVariable ""TOUR_SI_unitOrders"" }" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_posCas = (_veh getVariable ""TOUR_SI_unitOrders"" select 0) select 0;" \n
+                                         "_task = _veh getVariable ""TOUR_SI_unitOrders"" select 1;" \n
+                                         "_height = _veh getVariable ""TOUR_SI_unitOrders"" select 2;" \n
+                                         "_radiusCas = _veh getVariable ""TOUR_SI_unitOrders"" select 3;" \n
+                                         "_speed = _veh getVariable ""TOUR_SI_unitOrders"" select 4;" \n
+                                         "_behaviour = _veh getVariable ""TOUR_SI_unitOrders"" select 5;" \n
+                                         "_veh setVariable [""TOUR_SI_unitOrders"", nil, true];" \n
+                                         "if (!isNil {_veh getVariable ""TOUR_SI_unitFuel""}) then" \n
+                                         "{" \n
+                                         "	_fuel = _veh getVariable ""TOUR_SI_unitFuel"";" \n
+                                         "	_veh setFuel _fuel;" \n
+                                         "	_veh setVariable [""TOUR_SI_unitFuel"", nil, false];" \n
+                                         "};" \n
+                                         "_veh setSpeedMode _speed;" \n
+                                         "" \n
+                                         "switch (toLower _behaviour) do" \n
+                                         "{" \n
+                                         "	case ""hold fire"": { _grp setCombatMode ""BLUE""; _grp setBehaviour ""CARELESS""; _grp enableAttack false;" \n
+                                         "									{" \n
+                                         "										_x disableAi ""FSM"";" \n
+                                         "										_x disableAi ""TARGET"";" \n
+                                         "										_x disableAi ""AUTOTARGET"";" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "							};" \n
+                                         "	case ""return fire"": { _grp setCombatMode ""WHITE""; _grp setBehaviour ""SAFE""; _grp enableAttack true;" \n
+                                         "									{" \n
+                                         "										if ((count allTurrets _chopper) > 1) then" \n
+                                         "										{" \n
+                                         "											if (_x == (driver _chopper)) then" \n
+                                         "											{" \n
+                                         "												_x disableAi ""FSM"";" \n
+                                         "												_x disableAi ""TARGET"";" \n
+                                         "												_x enableAi ""AUTOTARGET"";" \n
+                                         "											}else" \n
+                                         "											{" \n
+                                         "												_x enableAi ""FSM"";" \n
+                                         "												_x enableAi ""TARGET"";" \n
+                                         "												_x enableAi ""AUTOTARGET"";" \n
+                                         "											};" \n
+                                         "										}else" \n
+                                         "										{" \n
+                                         "											_x disableAi ""FSM"";" \n
+                                         "											_x enableAi ""TARGET"";" \n
+                                         "											_x enableAi ""AUTOTARGET"";" \n
+                                         "										};" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "									" \n
+                                         "								};" \n
+                                         "	case ""fire at will"": { _grp setCombatMode ""YELLOW""; _grp setBehaviour ""AWARE""; _grp enableAttack true;" \n
+                                         "									{" \n
+                                         "										_x enableAi ""FSM"";" \n
+                                         "										_x enableAi ""TARGET"";" \n
+                                         "										_x enableAi ""AUTOTARGET"";" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "								};" \n
+                                         "};"/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "end1">*/
+                class end1
+                {
+                        name = "end1";
+                        itemno = 2;
+                        init = /*%FSM<STATEINIT""">*/"hint ""dead"";"/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "_">*/
+                class _
+                {
+                        name = "_";
+                        itemno = 4;
+                        init = /*%FSM<STATEINIT""">*/""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "killed">*/
+                                class killed
+                                {
+                                        itemno = 1;
+                                        priority = 50.000000;
+                                        to="end1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"(!alive _veh" \n
+                                         "||" \n
+                                         "((!canMove _veh)&&(fuel _veh > 0))" \n
+                                         "||" \n
+                                         "!alive driver _veh)" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""NEO_radioCasUnitStatus"", ""KILLED"", true];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "New_Task">*/
+                                class New_Task
+                                {
+                                        itemno = 3;
+                                        priority = 10.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil { _veh getVariable ""TOUR_SI_unitOrders"" }" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_posCas = (_veh getVariable ""TOUR_SI_unitOrders"" select 0) select 0;" \n
+                                         "_task = _veh getVariable ""TOUR_SI_unitOrders"" select 1;" \n
+                                         "_height = _veh getVariable ""TOUR_SI_unitOrders"" select 2;" \n
+                                         "_radiusCas = _veh getVariable ""TOUR_SI_unitOrders"" select 3;" \n
+                                         "_speed = _veh getVariable ""TOUR_SI_unitOrders"" select 4;" \n
+                                         "_behaviour = _veh getVariable ""TOUR_SI_unitOrders"" select 5;" \n
+                                         "_veh setVariable [""TOUR_SI_unitOrders"", nil, true];" \n
+                                         "if (!isNil {_veh getVariable ""TOUR_SI_unitFuel""}) then" \n
+                                         "{" \n
+                                         "	_fuel = _veh getVariable ""TOUR_SI_unitFuel"";" \n
+                                         "	_veh setFuel _fuel;" \n
+                                         "	_veh setVariable [""TOUR_SI_unitFuel"", nil, false];" \n
+                                         "};" \n
+                                         "_veh setSpeedMode _speed;" \n
+                                         "" \n
+                                         "switch (toLower _behaviour) do" \n
+                                         "{" \n
+                                         "	case ""hold fire"": { _grp setCombatMode ""BLUE""; _grp setBehaviour ""CARELESS""; _grp enableAttack false;" \n
+                                         "									{" \n
+                                         "										_x disableAi ""FSM"";" \n
+                                         "										_x disableAi ""TARGET"";" \n
+                                         "										_x disableAi ""AUTOTARGET"";" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "							};" \n
+                                         "	case ""return fire"": { _grp setCombatMode ""WHITE""; _grp setBehaviour ""SAFE""; _grp enableAttack true;" \n
+                                         "									{" \n
+                                         "										if ((count allTurrets _chopper) > 1) then" \n
+                                         "										{" \n
+                                         "											if (_x == (driver _chopper)) then" \n
+                                         "											{" \n
+                                         "												_x disableAi ""FSM"";" \n
+                                         "												_x disableAi ""TARGET"";" \n
+                                         "												_x enableAi ""AUTOTARGET"";" \n
+                                         "											}else" \n
+                                         "											{" \n
+                                         "												_x enableAi ""FSM"";" \n
+                                         "												_x enableAi ""TARGET"";" \n
+                                         "												_x enableAi ""AUTOTARGET"";" \n
+                                         "											};" \n
+                                         "										}else" \n
+                                         "										{" \n
+                                         "											_x disableAi ""FSM"";" \n
+                                         "											_x enableAi ""TARGET"";" \n
+                                         "											_x enableAi ""AUTOTARGET"";" \n
+                                         "										};" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "									" \n
+                                         "								};" \n
+                                         "	case ""fire at will"": { _grp setCombatMode ""YELLOW""; _grp setBehaviour ""AWARE""; _grp enableAttack true;" \n
+                                         "									{" \n
+                                         "										_x enableAi ""FSM"";" \n
+                                         "										_x enableAi ""TARGET"";" \n
+                                         "										_x enableAi ""AUTOTARGET"";" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "								};" \n
+                                         "};"/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "move">*/
+                                class move
+                                {
+                                        itemno = 13;
+                                        priority = 0.000000;
+                                        to="__3";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"(_task == ""move to"")" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""TOUR_SI_unitStatus"", ""move to"", true];" \n
+                                         "_veh flyInHeightASL [_height, _height, _height];" \n
+                                         "_veh flyInHeight _height;" \n
+                                         "_veh doMove _posCas;" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "RTB">*/
+                                class RTB
+                                {
+                                        itemno = 11;
+                                        priority = 0.000000;
+                                        to="__2";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"_task == ""return to base""" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""TOUR_SI_unitStatus"", ""return to base"", true];" \n
+                                         "_veh flyInHeightASL [_height, _height, _height];" \n
+                                         "_veh flyInHeight _height;" \n
+                                         "_grp setBehaviour ""CARELESS"";" \n
+                                         "_grp setCombatMode ""BLUE"";" \n
+                                         "_grp setSpeedMode ""FULL"";" \n
+                                         "_grp enableAttack false;" \n
+                                         "{ _x disableAi ""TARGET""; _x disableAi ""AUTOTARGET""; } forEach units _grp;" \n
+                                         "" \n
+                                         "_veh landAt _airport;" \n
+                                         "_veh spawn" \n
+                                         "{" \n
+                                         "	sleep 5;" \n
+                                         "	[_this, ""We are RTB. OUT"", ""side""] call TOUR_SI_fnc_broadcastmessage;" \n
+                                         "};" \n
+                                         "" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "SAD">*/
+                                class SAD
+                                {
+                                        itemno = 8;
+                                        priority = 0.000000;
+                                        to="__1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"(_task == ""cas"") or (_task == ""cas (laser designation)"")"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""TOUR_SI_unitStatus"", ""cas"", true];" \n
+                                         "_veh flyInHeightASL [_height, _height, _height];" \n
+                                         "_veh flyInHeight _height;" \n
+                                         "_grp setBehaviour ""COMBAT"";" \n
+                                         "_grp setCombatMode ""RED"";" \n
+                                         "_grp setSpeedMode ""FULL"";" \n
+                                         "" \n
+                                         "{	" \n
+                                         "	if !(_task == ""cas (laser designation)"") then" \n
+                                         "	{" \n
+                                         "		_grp enableAttack true;" \n
+                                         "		_x enableAi ""FSM"";" \n
+                                         "		_x enableAi ""TARGET"";" \n
+                                         "		_x enableAi ""AUTOTARGET"";" \n
+                                         "	}else" \n
+                                         "	{" \n
+                                         "		_grp enableAttack true;" \n
+                                         "		_x disableAi ""FSM"";" \n
+                                         "		_x disableAi ""TARGET"";" \n
+                                         "		_x disableAi ""AUTOTARGET"";" \n
+                                         "	};" \n
+                                         "	_x setSkill 1;" \n
+                                         "} forEach units _grp;" \n
+                                         "" \n
+                                         "_dirCas = [_posCas, _veh] call BIS_fnc_dirTo;" \n
+                                         "_posCircle = [_posCas, _radiusCas, _dirCas] call BIS_fnc_relPos;" \n
+                                         "_veh doMove _posCircle;" \n
+                                         "" \n
+                                         "[_veh, _task] spawn" \n
+                                         "{" \n
+                                         "	_veh = _this select 0;" \n
+                                         "	_task = _this select 1;" \n
+                                         "	sleep 5;" \n
+                                         "	" \n
+                                         "	if !(_task == ""cas (laser designation)"") then" \n
+                                         "	{" \n
+                                         "		[" \n
+                                         "			_veh," \n
+                                         "			""Copy that, moving to location to provide CAS. OUT""," \n
+                                         "			""side""" \n
+                                         "		] call TOUR_SI_fnc_broadcastmessage;" \n
+                                         "	}else" \n
+                                         "	{" \n
+                                         "		[" \n
+                                         "			_veh," \n
+                                         "			""Copy that, moving to location to provide CAS - Paint your target! OUT""," \n
+                                         "			""side""" \n
+                                         "		] call TOUR_SI_fnc_broadcastmessage;" \n
+                                         "	};" \n
+                                         "};"/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "__1">*/
+                class __1
+                {
+                        name = "__1";
+                        itemno = 9;
+                        init = /*%FSM<STATEINIT""">*/"_time = time;" \n
+                         ""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "killed">*/
+                                class killed
+                                {
+                                        itemno = 1;
+                                        priority = 50.000000;
+                                        to="end1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"(!alive _veh" \n
+                                         "||" \n
+                                         "((!canMove _veh)&&(fuel _veh > 0))" \n
+                                         "||" \n
+                                         "!alive driver _veh)" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""NEO_radioCasUnitStatus"", ""KILLED"", true];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "New_Task">*/
+                                class New_Task
+                                {
+                                        itemno = 3;
+                                        priority = 10.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil { _veh getVariable ""TOUR_SI_unitOrders"" }" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_posCas = (_veh getVariable ""TOUR_SI_unitOrders"" select 0) select 0;" \n
+                                         "_task = _veh getVariable ""TOUR_SI_unitOrders"" select 1;" \n
+                                         "_height = _veh getVariable ""TOUR_SI_unitOrders"" select 2;" \n
+                                         "_radiusCas = _veh getVariable ""TOUR_SI_unitOrders"" select 3;" \n
+                                         "_speed = _veh getVariable ""TOUR_SI_unitOrders"" select 4;" \n
+                                         "_behaviour = _veh getVariable ""TOUR_SI_unitOrders"" select 5;" \n
+                                         "_veh setVariable [""TOUR_SI_unitOrders"", nil, true];" \n
+                                         "if (!isNil {_veh getVariable ""TOUR_SI_unitFuel""}) then" \n
+                                         "{" \n
+                                         "	_fuel = _veh getVariable ""TOUR_SI_unitFuel"";" \n
+                                         "	_veh setFuel _fuel;" \n
+                                         "	_veh setVariable [""TOUR_SI_unitFuel"", nil, false];" \n
+                                         "};" \n
+                                         "_veh setSpeedMode _speed;" \n
+                                         "" \n
+                                         "switch (toLower _behaviour) do" \n
+                                         "{" \n
+                                         "	case ""hold fire"": { _grp setCombatMode ""BLUE""; _grp setBehaviour ""CARELESS""; _grp enableAttack false;" \n
+                                         "									{" \n
+                                         "										_x disableAi ""FSM"";" \n
+                                         "										_x disableAi ""TARGET"";" \n
+                                         "										_x disableAi ""AUTOTARGET"";" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "							};" \n
+                                         "	case ""return fire"": { _grp setCombatMode ""WHITE""; _grp setBehaviour ""SAFE""; _grp enableAttack true;" \n
+                                         "									{" \n
+                                         "										if ((count allTurrets _chopper) > 1) then" \n
+                                         "										{" \n
+                                         "											if (_x == (driver _chopper)) then" \n
+                                         "											{" \n
+                                         "												_x disableAi ""FSM"";" \n
+                                         "												_x disableAi ""TARGET"";" \n
+                                         "												_x enableAi ""AUTOTARGET"";" \n
+                                         "											}else" \n
+                                         "											{" \n
+                                         "												_x enableAi ""FSM"";" \n
+                                         "												_x enableAi ""TARGET"";" \n
+                                         "												_x enableAi ""AUTOTARGET"";" \n
+                                         "											};" \n
+                                         "										}else" \n
+                                         "										{" \n
+                                         "											_x disableAi ""FSM"";" \n
+                                         "											_x enableAi ""TARGET"";" \n
+                                         "											_x enableAi ""AUTOTARGET"";" \n
+                                         "										};" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "									" \n
+                                         "								};" \n
+                                         "	case ""fire at will"": { _grp setCombatMode ""YELLOW""; _grp setBehaviour ""AWARE""; _grp enableAttack true;" \n
+                                         "									{" \n
+                                         "										_x enableAi ""FSM"";" \n
+                                         "										_x enableAi ""TARGET"";" \n
+                                         "										_x enableAi ""AUTOTARGET"";" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "								};" \n
+                                         "};"/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "circle">*/
+                                class circle
+                                {
+                                        itemno = 7;
+                                        priority = 0.000000;
+                                        to="__1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"_time < time"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"//Reveal Targets" \n
+                                         "{" \n
+                                         "	if (alive _x && side _x != side _veh) then" \n
+                                         "	{" \n
+                                         "		_grp reveal _x;" \n
+                                         "	};" \n
+                                         "} forEach (_posCas nearEntities [[""Man"",""Air"",""Car"",""Motorcycle"",""Tank"", ""Wheeled_apc""], _radiusCas]);" \n
+                                         "" \n
+                                         "_dirCas = _dirCas + 90;" \n
+                                         "_posCircle = [_posCas, _radiusCas, _dirCas] call BIS_fnc_relPos;" \n
+                                         "" \n
+                                         "_veh doMove _posCircle;" \n
+                                         "" \n
+                                         "//Reveal Targets" \n
+                                         "{" \n
+                                         "	if (alive _x && side _x != side _veh) then" \n
+                                         "	{" \n
+                                         "		_grp reveal _x;" \n
+                                         "	};" \n
+                                         "} forEach (_posCircle nearEntities [[""LaserTargetE"",""LaserTargetW"",""I_IRStrobe"",""W_IRStrobe"",""E_IRStrobe"",""Man"",""Air"",""Car"",""Motorcycle"",""Tank"", ""Wheeled_apc""], _radiusCas]);" \n
+                                         "" \n
+                                         "if (unitReady _veh) then" \n
+                                         "{" \n
+                                         "_dirCircle = _dirCircle + 90;" \n
+                                         "_posCircle = [_pos, _radiusCircle, _dirCircle] call BIS_fnc_relPos;" \n
+                                         "" \n
+                                         "_veh doMove _posCircle;" \n
+                                         "};" \n
+                                         "" \n
+                                         "if (_task == ""cas (laser designation)"") then" \n
+                                         "{" \n
+                                         "	if (count (_pos nearEntities [[""LaserTargetE"",""LaserTargetW"",""I_IRStrobe"",""W_IRStrobe"",""E_IRStrobe""], _radiusCas]) > 0) then" \n
+                                         "	{" \n
+                                         "		{" \n
+                                         "			_x enableAi ""FSM"";" \n
+                                         "			_x enableAi ""TARGET"";" \n
+                                         "			_x doTarget ((_pos nearEntities [[""LaserTargetE"",""LaserTargetW"",""I_IRStrobe"",""W_IRStrobe"",""E_IRStrobe""], _radiusCas]) select 0);" \n
+                                         "		}forEach units _grp;	" \n
+                                         "		_grp enableAttack true;" \n
+                                         "	}else" \n
+                                         "	{" \n
+                                         "		{" \n
+                                         "			_x enableAi ""FSM"";" \n
+                                         "			_x disableAi ""TARGET"";" \n
+                                         "			_x disableAi ""AUTOTARGET"";" \n
+                                         "		}forEach units _grp;	" \n
+                                         "		_grp enableAttack true;" \n
+                                         "	};" \n
+                                         "};" \n
+                                         "" \n
+                                         "_time = time + 5;" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "__2">*/
+                class __2
+                {
+                        name = "__2";
+                        itemno = 12;
+                        init = /*%FSM<STATEINIT""">*/""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "killed">*/
+                                class killed
+                                {
+                                        itemno = 1;
+                                        priority = 50.000000;
+                                        to="end1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"(!alive _veh" \n
+                                         "||" \n
+                                         "((!canMove _veh)&&(fuel _veh > 0))" \n
+                                         "||" \n
+                                         "!alive driver _veh)" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""NEO_radioCasUnitStatus"", ""KILLED"", true];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "New_Task">*/
+                                class New_Task
+                                {
+                                        itemno = 3;
+                                        priority = 10.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil { _veh getVariable ""TOUR_SI_unitOrders"" }" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_posCas = (_veh getVariable ""TOUR_SI_unitOrders"" select 0) select 0;" \n
+                                         "_task = _veh getVariable ""TOUR_SI_unitOrders"" select 1;" \n
+                                         "_height = _veh getVariable ""TOUR_SI_unitOrders"" select 2;" \n
+                                         "_radiusCas = _veh getVariable ""TOUR_SI_unitOrders"" select 3;" \n
+                                         "_speed = _veh getVariable ""TOUR_SI_unitOrders"" select 4;" \n
+                                         "_behaviour = _veh getVariable ""TOUR_SI_unitOrders"" select 5;" \n
+                                         "_veh setVariable [""TOUR_SI_unitOrders"", nil, true];" \n
+                                         "if (!isNil {_veh getVariable ""TOUR_SI_unitFuel""}) then" \n
+                                         "{" \n
+                                         "	_fuel = _veh getVariable ""TOUR_SI_unitFuel"";" \n
+                                         "	_veh setFuel _fuel;" \n
+                                         "	_veh setVariable [""TOUR_SI_unitFuel"", nil, false];" \n
+                                         "};" \n
+                                         "_veh setSpeedMode _speed;" \n
+                                         "" \n
+                                         "switch (toLower _behaviour) do" \n
+                                         "{" \n
+                                         "	case ""hold fire"": { _grp setCombatMode ""BLUE""; _grp setBehaviour ""CARELESS""; _grp enableAttack false;" \n
+                                         "									{" \n
+                                         "										_x disableAi ""FSM"";" \n
+                                         "										_x disableAi ""TARGET"";" \n
+                                         "										_x disableAi ""AUTOTARGET"";" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "							};" \n
+                                         "	case ""return fire"": { _grp setCombatMode ""WHITE""; _grp setBehaviour ""SAFE""; _grp enableAttack true;" \n
+                                         "									{" \n
+                                         "										if ((count allTurrets _chopper) > 1) then" \n
+                                         "										{" \n
+                                         "											if (_x == (driver _chopper)) then" \n
+                                         "											{" \n
+                                         "												_x disableAi ""FSM"";" \n
+                                         "												_x disableAi ""TARGET"";" \n
+                                         "												_x enableAi ""AUTOTARGET"";" \n
+                                         "											}else" \n
+                                         "											{" \n
+                                         "												_x enableAi ""FSM"";" \n
+                                         "												_x enableAi ""TARGET"";" \n
+                                         "												_x enableAi ""AUTOTARGET"";" \n
+                                         "											};" \n
+                                         "										}else" \n
+                                         "										{" \n
+                                         "											_x disableAi ""FSM"";" \n
+                                         "											_x enableAi ""TARGET"";" \n
+                                         "											_x enableAi ""AUTOTARGET"";" \n
+                                         "										};" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "									" \n
+                                         "								};" \n
+                                         "	case ""fire at will"": { _grp setCombatMode ""YELLOW""; _grp setBehaviour ""AWARE""; _grp enableAttack true;" \n
+                                         "									{" \n
+                                         "										_x enableAi ""FSM"";" \n
+                                         "										_x enableAi ""TARGET"";" \n
+                                         "										_x enableAi ""AUTOTARGET"";" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "								};" \n
+                                         "};"/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "Service">*/
+                                class Service
+                                {
+                                        itemno = 18;
+                                        priority = 10.000000;
+                                        to="__2";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"_time < time"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"if (_veh getVariable ""TOUR_SI_unitStatus"" == ""servicing"") then" \n
+                                         "{" \n
+                                         "	_add = 0.01;" \n
+                                         "	_damage = (damage _veh) - _add;" \n
+                                         "	if (isNil {_veh getVariable ""TOUR_SI_unitFuel""}) then" \n
+                                         "	{" \n
+                                         "		_veh setVariable [""TOUR_SI_unitFuel"", (fuel _veh), false];" \n
+                                         "	};" \n
+                                         "" \n
+                                         "	_fuel = (_veh getVariable ""TOUR_SI_unitFuel"");" \n
+                                         "	_fuel = _fuel + _add;" \n
+                                         "" \n
+                                         "	if (_fuel > 1) then" \n
+                                         "	{" \n
+                                         "		_fuel = 1;" \n
+                                         "	};" \n
+                                         "" \n
+                                         "	if (_damage < 0) then" \n
+                                         "	{" \n
+                                         "		_damage = 0;" \n
+                                         "	};" \n
+                                         "	_veh setDamage _damage;" \n
+                                         "" \n
+                                         "	_veh setVariable [""TOUR_SI_unitFuel"", _fuel, false];" \n
+                                         "" \n
+                                         "	if ((_fuel == 1) && (damage _veh == 0)) then" \n
+                                         "	{" \n
+                                         "		_veh setVehicleAmmo 1;" \n
+                                         "		[" \n
+                                         "			_veh," \n
+                                         "			""Service complete, we are good to go! OUT""," \n
+                                         "			""side""" \n
+                                         "		] call TOUR_SI_fnc_broadcastMessage;" \n
+                                         "		_veh setVariable [""TOUR_SI_unitStatus"", ""idle"", true];" \n
+                                         "	};" \n
+                                         "};" \n
+                                         "" \n
+                                         "_time = time + 1;" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "__3">*/
+                class __3
+                {
+                        name = "__3";
+                        itemno = 14;
+                        init = /*%FSM<STATEINIT""">*/"_veh spawn" \n
+                         "{" \n
+                         "	sleep 5;" \n
+                         "	" \n
+                         "	[" \n
+                         "		_this," \n
+                         "		""Copy that, we are moving to location. OUT""," \n
+                         "		""side""" \n
+                         "	] call TOUR_SI_fnc_broadcastmessage;" \n
+                         "};" \n
+                         ""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "killed">*/
+                                class killed
+                                {
+                                        itemno = 1;
+                                        priority = 50.000000;
+                                        to="end1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"(!alive _veh" \n
+                                         "||" \n
+                                         "((!canMove _veh)&&(fuel _veh > 0))" \n
+                                         "||" \n
+                                         "!alive driver _veh)" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""NEO_radioCasUnitStatus"", ""KILLED"", true];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "New_Task">*/
+                                class New_Task
+                                {
+                                        itemno = 3;
+                                        priority = 10.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil { _veh getVariable ""TOUR_SI_unitOrders"" }" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_posCas = (_veh getVariable ""TOUR_SI_unitOrders"" select 0) select 0;" \n
+                                         "_task = _veh getVariable ""TOUR_SI_unitOrders"" select 1;" \n
+                                         "_height = _veh getVariable ""TOUR_SI_unitOrders"" select 2;" \n
+                                         "_radiusCas = _veh getVariable ""TOUR_SI_unitOrders"" select 3;" \n
+                                         "_speed = _veh getVariable ""TOUR_SI_unitOrders"" select 4;" \n
+                                         "_behaviour = _veh getVariable ""TOUR_SI_unitOrders"" select 5;" \n
+                                         "_veh setVariable [""TOUR_SI_unitOrders"", nil, true];" \n
+                                         "if (!isNil {_veh getVariable ""TOUR_SI_unitFuel""}) then" \n
+                                         "{" \n
+                                         "	_fuel = _veh getVariable ""TOUR_SI_unitFuel"";" \n
+                                         "	_veh setFuel _fuel;" \n
+                                         "	_veh setVariable [""TOUR_SI_unitFuel"", nil, false];" \n
+                                         "};" \n
+                                         "_veh setSpeedMode _speed;" \n
+                                         "" \n
+                                         "switch (toLower _behaviour) do" \n
+                                         "{" \n
+                                         "	case ""hold fire"": { _grp setCombatMode ""BLUE""; _grp setBehaviour ""CARELESS""; _grp enableAttack false;" \n
+                                         "									{" \n
+                                         "										_x disableAi ""FSM"";" \n
+                                         "										_x disableAi ""TARGET"";" \n
+                                         "										_x disableAi ""AUTOTARGET"";" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "							};" \n
+                                         "	case ""return fire"": { _grp setCombatMode ""WHITE""; _grp setBehaviour ""SAFE""; _grp enableAttack true;" \n
+                                         "									{" \n
+                                         "										if ((count allTurrets _chopper) > 1) then" \n
+                                         "										{" \n
+                                         "											if (_x == (driver _chopper)) then" \n
+                                         "											{" \n
+                                         "												_x disableAi ""FSM"";" \n
+                                         "												_x disableAi ""TARGET"";" \n
+                                         "												_x enableAi ""AUTOTARGET"";" \n
+                                         "											}else" \n
+                                         "											{" \n
+                                         "												_x enableAi ""FSM"";" \n
+                                         "												_x enableAi ""TARGET"";" \n
+                                         "												_x enableAi ""AUTOTARGET"";" \n
+                                         "											};" \n
+                                         "										}else" \n
+                                         "										{" \n
+                                         "											_x disableAi ""FSM"";" \n
+                                         "											_x enableAi ""TARGET"";" \n
+                                         "											_x enableAi ""AUTOTARGET"";" \n
+                                         "										};" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "									" \n
+                                         "								};" \n
+                                         "	case ""fire at will"": { _grp setCombatMode ""YELLOW""; _grp setBehaviour ""AWARE""; _grp enableAttack true;" \n
+                                         "									{" \n
+                                         "										_x enableAi ""FSM"";" \n
+                                         "										_x enableAi ""TARGET"";" \n
+                                         "										_x enableAi ""AUTOTARGET"";" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "								};" \n
+                                         "};"/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "at_position">*/
+                                class at_position
+                                {
+                                        itemno = 15;
+                                        priority = 0.000000;
+                                        to="__4";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"unitReady _veh" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "__4">*/
+                class __4
+                {
+                        name = "__4";
+                        itemno = 16;
+                        init = /*%FSM<STATEINIT""">*/"[" \n
+                         "	_veh," \n
+                         "	""Holding position and waiting for further orders. OUT""," \n
+                         "	""side""" \n
+                         "] call TOUR_SI_fnc_broadcastmessage;" \n
+                         ""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "killed">*/
+                                class killed
+                                {
+                                        itemno = 1;
+                                        priority = 50.000000;
+                                        to="end1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"(!alive _veh" \n
+                                         "||" \n
+                                         "((!canMove _veh)&&(fuel _veh > 0))" \n
+                                         "||" \n
+                                         "!alive driver _veh)" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""NEO_radioCasUnitStatus"", ""KILLED"", true];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "New_Task">*/
+                                class New_Task
+                                {
+                                        itemno = 3;
+                                        priority = 10.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil { _veh getVariable ""TOUR_SI_unitOrders"" }" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_posCas = (_veh getVariable ""TOUR_SI_unitOrders"" select 0) select 0;" \n
+                                         "_task = _veh getVariable ""TOUR_SI_unitOrders"" select 1;" \n
+                                         "_height = _veh getVariable ""TOUR_SI_unitOrders"" select 2;" \n
+                                         "_radiusCas = _veh getVariable ""TOUR_SI_unitOrders"" select 3;" \n
+                                         "_speed = _veh getVariable ""TOUR_SI_unitOrders"" select 4;" \n
+                                         "_behaviour = _veh getVariable ""TOUR_SI_unitOrders"" select 5;" \n
+                                         "_veh setVariable [""TOUR_SI_unitOrders"", nil, true];" \n
+                                         "if (!isNil {_veh getVariable ""TOUR_SI_unitFuel""}) then" \n
+                                         "{" \n
+                                         "	_fuel = _veh getVariable ""TOUR_SI_unitFuel"";" \n
+                                         "	_veh setFuel _fuel;" \n
+                                         "	_veh setVariable [""TOUR_SI_unitFuel"", nil, false];" \n
+                                         "};" \n
+                                         "_veh setSpeedMode _speed;" \n
+                                         "" \n
+                                         "switch (toLower _behaviour) do" \n
+                                         "{" \n
+                                         "	case ""hold fire"": { _grp setCombatMode ""BLUE""; _grp setBehaviour ""CARELESS""; _grp enableAttack false;" \n
+                                         "									{" \n
+                                         "										_x disableAi ""FSM"";" \n
+                                         "										_x disableAi ""TARGET"";" \n
+                                         "										_x disableAi ""AUTOTARGET"";" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "							};" \n
+                                         "	case ""return fire"": { _grp setCombatMode ""WHITE""; _grp setBehaviour ""SAFE""; _grp enableAttack true;" \n
+                                         "									{" \n
+                                         "										if ((count allTurrets _chopper) > 1) then" \n
+                                         "										{" \n
+                                         "											if (_x == (driver _chopper)) then" \n
+                                         "											{" \n
+                                         "												_x disableAi ""FSM"";" \n
+                                         "												_x disableAi ""TARGET"";" \n
+                                         "												_x enableAi ""AUTOTARGET"";" \n
+                                         "											}else" \n
+                                         "											{" \n
+                                         "												_x enableAi ""FSM"";" \n
+                                         "												_x enableAi ""TARGET"";" \n
+                                         "												_x enableAi ""AUTOTARGET"";" \n
+                                         "											};" \n
+                                         "										}else" \n
+                                         "										{" \n
+                                         "											_x disableAi ""FSM"";" \n
+                                         "											_x enableAi ""TARGET"";" \n
+                                         "											_x enableAi ""AUTOTARGET"";" \n
+                                         "										};" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "									" \n
+                                         "								};" \n
+                                         "	case ""fire at will"": { _grp setCombatMode ""YELLOW""; _grp setBehaviour ""AWARE""; _grp enableAttack true;" \n
+                                         "									{" \n
+                                         "										_x enableAi ""FSM"";" \n
+                                         "										_x enableAi ""TARGET"";" \n
+                                         "										_x enableAi ""AUTOTARGET"";" \n
+                                         "										_x setSkill 1;" \n
+                                         "									} forEach units _grp;" \n
+                                         "								};" \n
+                                         "};"/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+        };
+        initState="react";
+        finalStates[] =
+        {
+                "end1",
+        };
+};
+/*%FSM</COMPILE>*/

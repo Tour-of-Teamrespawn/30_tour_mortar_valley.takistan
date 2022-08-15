@@ -1,0 +1,614 @@
+/*%FSM<COMPILE "scriptedFSM.cfg, cas">*/
+/*%FSM<HEAD>*/
+/*
+item0[] = {"react",0,4346,-37.443069,45.098049,52.556931,95.098053,0.000000,"react"};
+item1[] = {"killed",4,218,-231.102844,45.315475,-141.102768,95.315475,50.000000,"killed"};
+item2[] = {"end1",1,250,-387.070557,45.144203,-297.070526,95.144188,0.000000,"end1"};
+item3[] = {"New_Task",4,218,-37.668053,138.662827,52.331947,188.662827,10.000000,"New Task"};
+item4[] = {"RRR",2,250,-37.496964,235.797745,52.503052,285.797729,0.000000,"RRR"};
+item5[] = {"",7,210,-190.932526,257.277374,-182.932526,265.277374,0.000000,""};
+item6[] = {"",7,210,-190.273483,159.833786,-182.273483,167.833786,0.000000,""};
+item7[] = {"circle",4,218,107.752441,522.540161,197.752411,572.540161,0.000000,"circle"};
+item8[] = {"SAD",4,218,106.936607,324.913818,196.936615,374.913818,0.000000,"SAD"};
+item9[] = {"_",2,250,108.726959,416.132996,198.726959,466.132996,0.000000,""};
+item10[] = {"",7,210,-190.843689,437.671875,-182.843689,445.671875,0.000000,""};
+item11[] = {"RTB",4,218,-37.511124,328.813751,52.488907,378.813751,0.000000,"RTB"};
+item12[] = {"__1",2,250,-42.005722,414.336884,47.994308,464.336884,0.000000,""};
+item13[] = {"move",4,218,251.975586,316.659943,341.975677,366.659943,0.000000,"move"};
+item14[] = {"__2",2,250,251.563690,414.672272,341.563690,464.672272,0.000000,""};
+item15[] = {"at_position",4,218,251.563721,519.424683,341.563721,569.424927,0.000000,"at position"};
+item16[] = {"__3",2,250,251.389648,637.203613,341.389648,687.203613,0.000000,""};
+item17[] = {"",7,210,-193.440979,666.234070,-185.440979,674.234070,0.000000,""};
+link0[] = {0,1};
+link1[] = {0,3};
+link2[] = {1,2};
+link3[] = {3,4};
+link4[] = {4,5};
+link5[] = {4,8};
+link6[] = {4,11};
+link7[] = {4,13};
+link8[] = {5,6};
+link9[] = {6,1};
+link10[] = {6,3};
+link11[] = {7,9};
+link12[] = {8,9};
+link13[] = {9,7};
+link14[] = {9,10};
+link15[] = {10,5};
+link16[] = {11,12};
+link17[] = {12,10};
+link18[] = {13,14};
+link19[] = {14,10};
+link20[] = {14,15};
+link21[] = {15,16};
+link22[] = {16,17};
+link23[] = {17,10};
+globals[] = {0.000000,0,0,0,0,640,480,1,60,6316128,1,-743.327087,447.234436,920.449890,-241.196335,947,924,1};
+window[] = {2,-1,-1,-32000,-32000,841,104,1364,104,3,965};
+*//*%FSM</HEAD>*/
+class FSM
+{
+        fsmName = "cas";
+        class States
+        {
+                /*%FSM<STATE "react">*/
+                class react
+                {
+                        name = "react";
+                        itemno = 0;
+                        init = /*%FSM<STATEINIT""">*/"private " \n
+                         "[" \n
+                         "	""_veh"", ""_grp"", ""_callsign"", ""_pos"", ""_airport"", ""_taskArray"", ""_task"", ""_posCircle"", ""_dirCas"", ""_posCas"", ""_radiusCas""," \n
+                         "	""_flyInHeight"", ""_h"", ""_posIn"", ""_target"", ""_base""" \n
+                         "];" \n
+                         "_veh = _this select 0;" \n
+                         "_grp = _this select 1;" \n
+                         "_callsign = _this select 2;" \n
+                         "_base = _this select 3;" \n
+                         "_airport = _this select 4;" \n
+                         "_taskArray = [];" \n
+                         "_task = ""idle"";" \n
+                         "_posCircle = [];" \n
+                         "_dirCas = 0;" \n
+                         "_posCas = [];" \n
+                         "_radiusCas = 500;" \n
+                         "_height = 200;" \n
+                         "_h = createVehicle [""Land_HelipadEmpty_F"", _base, [], 0, ""CAN_COLLIDE""];" \n
+                         "//_posIn = [];" \n
+                         "_target = objNull;" \n
+                         "_time = time;" \n
+                         "" \n
+                         "_veh lockDriver true;" \n
+                         "_veh lock true;" \n
+                         "{" \n
+                         "	_x setSkill 1;" \n
+                         "	_x allowFleeing 0;" \n
+                         "} forEach units _grp;" \n
+                         "" \n
+                         "//Vehicle Status" \n
+                         "_veh setVariable  [""TOUR_SI_unitStatus"", ""idle"", true];" \n
+                         "" \n
+                         "if (_veh isKindOf ""air"") then " \n
+                         "{ " \n
+                         "	_veh setFuel 0;" \n
+                         "	_veh addEventHandler [""LandedStopped"", " \n
+                         "	{" \n
+                         "		if (!local (_this select 0)) exitWith {};" \n
+                         "		if (((_this select 0) getVariable ""TOUR_SI_unitStatus"") == ""idle"") exitWith {};" \n
+                         "		" \n
+                         "		private [""_veh"", ""_airport""];" \n
+                         "		_veh = _this select 0;" \n
+                         "		_airport = _this select 1;" \n
+                         "		" \n
+                         "		_veh setVariable [""TOUR_SI_unitStatus"", ""idle"", true];" \n
+                         "		_veh spawn 	{" \n
+                         "								sleep 20; " \n
+                         "								_this setFuel 0;" \n
+                         "								[_this, getPosATL _this] spawn TOUR_SI_fnc_repairRTB;" \n
+                         "						};" \n
+                         "		" \n
+                         "		[_veh, ""We are at base. OUT"", ""side""] call TOUR_SI_fnc_broadcastmessage;" \n
+                         "	}];" \n
+                         "};" \n
+                         ""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "killed">*/
+                                class killed
+                                {
+                                        itemno = 1;
+                                        priority = 50.000000;
+                                        to="end1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!alive _veh" \n
+                                         "||" \n
+                                         "!canMove _veh" \n
+                                         "||" \n
+                                         "!alive driver _veh" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""NEO_radioCasUnitStatus"", ""KILLED"", true];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "New_Task">*/
+                                class New_Task
+                                {
+                                        itemno = 3;
+                                        priority = 10.000000;
+                                        to="RRR";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil { _veh getVariable ""TOUR_SI_Orders"" }" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_posCas = _veh getVariable ""TOUR_SI_heliOrders"" select 0;" \n
+                                         "_task = _veh getVariable ""TOUR_SI_heliOrders"" select 1;" \n
+                                         "_height = _veh getVariable ""TOUR_SI_heliOrders"" select 2;" \n
+                                         "_radiusCas = _veh getVariable ""TOUR_SI_heliOrders"" select 3;" \n
+                                         "_speed = _veh getVariable ""TOUR_SI_heliOrders"" select 4;" \n
+                                         "_behaviour = _veh getVariable ""TOUR_SI_heliOrders"" select 5;" \n
+                                         "_chopper setVariable [""TOUR_SI_heliOrders"", nil, true];" \n
+                                         "_chopper setVariable [""TOUR_SI_CAS_Laser"", nil];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "end1">*/
+                class end1
+                {
+                        name = "end1";
+                        itemno = 2;
+                        init = /*%FSM<STATEINIT""">*/""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "RRR">*/
+                class RRR
+                {
+                        name = "RRR";
+                        itemno = 4;
+                        init = /*%FSM<STATEINIT""">*/""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "killed">*/
+                                class killed
+                                {
+                                        itemno = 1;
+                                        priority = 50.000000;
+                                        to="end1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!alive _veh" \n
+                                         "||" \n
+                                         "!canMove _veh" \n
+                                         "||" \n
+                                         "!alive driver _veh" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""NEO_radioCasUnitStatus"", ""KILLED"", true];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "New_Task">*/
+                                class New_Task
+                                {
+                                        itemno = 3;
+                                        priority = 10.000000;
+                                        to="RRR";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil { _veh getVariable ""TOUR_SI_Orders"" }" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_posCas = _veh getVariable ""TOUR_SI_heliOrders"" select 0;" \n
+                                         "_task = _veh getVariable ""TOUR_SI_heliOrders"" select 1;" \n
+                                         "_height = _veh getVariable ""TOUR_SI_heliOrders"" select 2;" \n
+                                         "_radiusCas = _veh getVariable ""TOUR_SI_heliOrders"" select 3;" \n
+                                         "_speed = _veh getVariable ""TOUR_SI_heliOrders"" select 4;" \n
+                                         "_behaviour = _veh getVariable ""TOUR_SI_heliOrders"" select 5;" \n
+                                         "_chopper setVariable [""TOUR_SI_heliOrders"", nil, true];" \n
+                                         "_chopper setVariable [""TOUR_SI_CAS_Laser"", nil];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "move">*/
+                                class move
+                                {
+                                        itemno = 13;
+                                        priority = 0.000000;
+                                        to="__2";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"(_task == ""move to"")" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""TOUR_SI_unitStatus"", ""move to"", true];" \n
+                                         "_veh flyInHeightASL [_height, _height, _height];" \n
+                                         "_veh flyInHeight _height;" \n
+                                         "_veh doMove _pos;" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "RTB">*/
+                                class RTB
+                                {
+                                        itemno = 11;
+                                        priority = 0.000000;
+                                        to="__1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"_task == ""return to base""" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""TOUR_SI_unitStatus"", ""return to base"", true];" \n
+                                         "_veh flyInHeightASL [_height, _height, _height];" \n
+                                         "_veh flyInHeight _height;" \n
+                                         "_veh doMove _base;" \n
+                                         "_grp setBehaviour ""CARELESS"";" \n
+                                         "_grp setCombatMode ""BLUE"";" \n
+                                         "_grp setSpeedMode ""FULL"";" \n
+                                         "_grp enableAttack false;" \n
+                                         "{ _x disableAi ""TARGET""; _x disableAi ""AUTOTARGET""; } forEach units _grp;" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "SAD">*/
+                                class SAD
+                                {
+                                        itemno = 8;
+                                        priority = 0.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"(_task == ""cas"") or (_task == ""cas (laser designation)"")"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""TOUR_SI_unitStatus"", ""cas"", true];" \n
+                                         "_veh flyInHeightASL [_height, _height, _height];" \n
+                                         "_veh flyInHeight _height;" \n
+                                         "_grp setBehaviour ""COMBAT"";" \n
+                                         "_grp setCombatMode ""RED"";" \n
+                                         "_grp setSpeedMode ""FULL"";" \n
+                                         "" \n
+                                         "{	" \n
+                                         "	if !(_task == ""cas (laser designation)"") then" \n
+                                         "	{" \n
+                                         "		_grp enableAttack true;" \n
+                                         "		_x enableAi ""FSM"";" \n
+                                         "		_x enableAi ""TARGET"";" \n
+                                         "		_x enableAi ""AUTOTARGET"";" \n
+                                         "	}else" \n
+                                         "	{" \n
+                                         "		_grp enableAttack true;" \n
+                                         "		_x disableAi ""FSM"";" \n
+                                         "		_x disableAi ""TARGET"";" \n
+                                         "		_x disableAi ""AUTOTARGET"";" \n
+                                         "	};" \n
+                                         "	_x setSkill 1;" \n
+                                         "} forEach units _grp;" \n
+                                         "" \n
+                                         "_dirCas = [_posCas, _veh] call BIS_fnc_dirTo;" \n
+                                         "_posCircle = [_posCas, _radiusCas, _dirCas] call BIS_fnc_relPos;" \n
+                                         "_veh doMove _posCircle;" \n
+                                         "" \n
+                                         "[_veh, _task] spawn" \n
+                                         "{" \n
+                                         "	_veh = _this select 0;" \n
+                                         "	_task = _this select 1;" \n
+                                         "	sleep 5;" \n
+                                         "	" \n
+                                         "	if !(_task == ""cas (laser designation)"") then" \n
+                                         "	{" \n
+                                         "		[" \n
+                                         "			_veh," \n
+                                         "			""Copy that, moving to location to provide CAS. OUT""," \n
+                                         "			""side""" \n
+                                         "		] call TOUR_SI_fnc_broadcastmessage;" \n
+                                         "	}else" \n
+                                         "	{" \n
+                                         "		[" \n
+                                         "			_veh," \n
+                                         "			""Copy that, moving to location to provide CAS - Paint your target! OUT""," \n
+                                         "			""side""" \n
+                                         "		] call TOUR_SI_fnc_broadcastmessage;" \n
+                                         "	};" \n
+                                         "};"/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "_">*/
+                class _
+                {
+                        name = "_";
+                        itemno = 9;
+                        init = /*%FSM<STATEINIT""">*/"_time = time;" \n
+                         ""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "killed">*/
+                                class killed
+                                {
+                                        itemno = 1;
+                                        priority = 50.000000;
+                                        to="end1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!alive _veh" \n
+                                         "||" \n
+                                         "!canMove _veh" \n
+                                         "||" \n
+                                         "!alive driver _veh" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""NEO_radioCasUnitStatus"", ""KILLED"", true];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "New_Task">*/
+                                class New_Task
+                                {
+                                        itemno = 3;
+                                        priority = 10.000000;
+                                        to="RRR";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil { _veh getVariable ""TOUR_SI_Orders"" }" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_posCas = _veh getVariable ""TOUR_SI_heliOrders"" select 0;" \n
+                                         "_task = _veh getVariable ""TOUR_SI_heliOrders"" select 1;" \n
+                                         "_height = _veh getVariable ""TOUR_SI_heliOrders"" select 2;" \n
+                                         "_radiusCas = _veh getVariable ""TOUR_SI_heliOrders"" select 3;" \n
+                                         "_speed = _veh getVariable ""TOUR_SI_heliOrders"" select 4;" \n
+                                         "_behaviour = _veh getVariable ""TOUR_SI_heliOrders"" select 5;" \n
+                                         "_chopper setVariable [""TOUR_SI_heliOrders"", nil, true];" \n
+                                         "_chopper setVariable [""TOUR_SI_CAS_Laser"", nil];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "circle">*/
+                                class circle
+                                {
+                                        itemno = 7;
+                                        priority = 0.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"_time < time"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"//Reveal Targets" \n
+                                         "{" \n
+                                         "	if (alive _x && side _x != side _veh) then" \n
+                                         "	{" \n
+                                         "		_grp reveal _x;" \n
+                                         "	};" \n
+                                         "} forEach (_posCas nearEntities [[""Man"",""Air"",""Car"",""Motorcycle"",""Tank"", ""Wheeled_apc""], _radiusCas]);" \n
+                                         "" \n
+                                         "_dirCas = _dirCas + 90;" \n
+                                         "_posCircle = [_posCas, _radiusCas, _dirCas] call BIS_fnc_relPos;" \n
+                                         "" \n
+                                         "_veh doMove _posCircle;" \n
+                                         "" \n
+                                         "//Reveal Targets" \n
+                                         "{" \n
+                                         "	if (alive _x && side _x != side _veh) then" \n
+                                         "	{" \n
+                                         "		_grp reveal _x;" \n
+                                         "	};" \n
+                                         "} forEach (_posCircle nearEntities [[""LaserTargetE"",""LaserTargetW"",""I_IRStrobe"",""W_IRStrobe"",""E_IRStrobe"",""Man"",""Air"",""Car"",""Motorcycle"",""Tank"", ""Wheeled_apc""], _radiusCas]);" \n
+                                         "" \n
+                                         "if (unitReady _veh) then" \n
+                                         "{" \n
+                                         "_dirCircle = _dirCircle + 90;" \n
+                                         "_posCircle = [_pos, _radiusCircle, _dirCircle] call BIS_fnc_relPos;" \n
+                                         "" \n
+                                         "_veh doMove _posCircle;" \n
+                                         "};" \n
+                                         "" \n
+                                         "if (_task == ""cas (laser designation)"") then" \n
+                                         "{" \n
+                                         "	if (count (_pos nearEntities [[""LaserTargetE"",""LaserTargetW"",""I_IRStrobe"",""W_IRStrobe"",""E_IRStrobe""], _radiusCas]) > 0) then" \n
+                                         "	{" \n
+                                         "		{" \n
+                                         "			_x enableAi ""FSM"";" \n
+                                         "			_x enableAi ""TARGET"";" \n
+                                         "			_x doTarget ((_pos nearEntities [[""LaserTargetE"",""LaserTargetW"",""I_IRStrobe"",""W_IRStrobe"",""E_IRStrobe""], _radiusCas]) select 0);" \n
+                                         "		}forEach units _grp;	" \n
+                                         "		_grp enableAttack true;" \n
+                                         "	}else" \n
+                                         "	{" \n
+                                         "		{" \n
+                                         "			_x enableAi ""FSM"";" \n
+                                         "			_x disableAi ""TARGET"";" \n
+                                         "			_x disableAi ""AUTOTARGET"";" \n
+                                         "		}forEach units _grp;	" \n
+                                         "		_grp enableAttack true;" \n
+                                         "	};" \n
+                                         "};" \n
+                                         "" \n
+                                         "_time = time + 5;" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "__1">*/
+                class __1
+                {
+                        name = "__1";
+                        itemno = 12;
+                        init = /*%FSM<STATEINIT""">*/"_veh landAt _airport;" \n
+                         "_veh spawn" \n
+                         "{" \n
+                         "	sleep 5;" \n
+                         "	[_this, ""We are RTB. OUT"", ""side""] call TOUR_SI_fnc_broadcastmessage;" \n
+                         "};" \n
+                         ""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "killed">*/
+                                class killed
+                                {
+                                        itemno = 1;
+                                        priority = 50.000000;
+                                        to="end1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!alive _veh" \n
+                                         "||" \n
+                                         "!canMove _veh" \n
+                                         "||" \n
+                                         "!alive driver _veh" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""NEO_radioCasUnitStatus"", ""KILLED"", true];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "New_Task">*/
+                                class New_Task
+                                {
+                                        itemno = 3;
+                                        priority = 10.000000;
+                                        to="RRR";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil { _veh getVariable ""TOUR_SI_Orders"" }" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_posCas = _veh getVariable ""TOUR_SI_heliOrders"" select 0;" \n
+                                         "_task = _veh getVariable ""TOUR_SI_heliOrders"" select 1;" \n
+                                         "_height = _veh getVariable ""TOUR_SI_heliOrders"" select 2;" \n
+                                         "_radiusCas = _veh getVariable ""TOUR_SI_heliOrders"" select 3;" \n
+                                         "_speed = _veh getVariable ""TOUR_SI_heliOrders"" select 4;" \n
+                                         "_behaviour = _veh getVariable ""TOUR_SI_heliOrders"" select 5;" \n
+                                         "_chopper setVariable [""TOUR_SI_heliOrders"", nil, true];" \n
+                                         "_chopper setVariable [""TOUR_SI_CAS_Laser"", nil];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "__2">*/
+                class __2
+                {
+                        name = "__2";
+                        itemno = 14;
+                        init = /*%FSM<STATEINIT""">*/"_veh spawn" \n
+                         "{" \n
+                         "	sleep 5;" \n
+                         "	" \n
+                         "	[" \n
+                         "		_this," \n
+                         "		""Copy that, we are moving to location. OUT""," \n
+                         "		""side""" \n
+                         "	] call TOUR_SI_fnc_broadcastmessage;" \n
+                         "};" \n
+                         ""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "killed">*/
+                                class killed
+                                {
+                                        itemno = 1;
+                                        priority = 50.000000;
+                                        to="end1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!alive _veh" \n
+                                         "||" \n
+                                         "!canMove _veh" \n
+                                         "||" \n
+                                         "!alive driver _veh" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""NEO_radioCasUnitStatus"", ""KILLED"", true];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "New_Task">*/
+                                class New_Task
+                                {
+                                        itemno = 3;
+                                        priority = 10.000000;
+                                        to="RRR";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil { _veh getVariable ""TOUR_SI_Orders"" }" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_posCas = _veh getVariable ""TOUR_SI_heliOrders"" select 0;" \n
+                                         "_task = _veh getVariable ""TOUR_SI_heliOrders"" select 1;" \n
+                                         "_height = _veh getVariable ""TOUR_SI_heliOrders"" select 2;" \n
+                                         "_radiusCas = _veh getVariable ""TOUR_SI_heliOrders"" select 3;" \n
+                                         "_speed = _veh getVariable ""TOUR_SI_heliOrders"" select 4;" \n
+                                         "_behaviour = _veh getVariable ""TOUR_SI_heliOrders"" select 5;" \n
+                                         "_chopper setVariable [""TOUR_SI_heliOrders"", nil, true];" \n
+                                         "_chopper setVariable [""TOUR_SI_CAS_Laser"", nil];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "at_position">*/
+                                class at_position
+                                {
+                                        itemno = 15;
+                                        priority = 0.000000;
+                                        to="__3";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"unitReady _veh" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "__3">*/
+                class __3
+                {
+                        name = "__3";
+                        itemno = 16;
+                        init = /*%FSM<STATEINIT""">*/"[" \n
+                         "	_veh," \n
+                         "	""Holding position and waiting for further orders. OUT""," \n
+                         "	""side""" \n
+                         "] call TOUR_SI_fnc_broadcastmessage;" \n
+                         ""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "killed">*/
+                                class killed
+                                {
+                                        itemno = 1;
+                                        priority = 50.000000;
+                                        to="end1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!alive _veh" \n
+                                         "||" \n
+                                         "!canMove _veh" \n
+                                         "||" \n
+                                         "!alive driver _veh" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_veh setVariable [""NEO_radioCasUnitStatus"", ""KILLED"", true];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "New_Task">*/
+                                class New_Task
+                                {
+                                        itemno = 3;
+                                        priority = 10.000000;
+                                        to="RRR";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"!isNil { _veh getVariable ""TOUR_SI_Orders"" }" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_posCas = _veh getVariable ""TOUR_SI_heliOrders"" select 0;" \n
+                                         "_task = _veh getVariable ""TOUR_SI_heliOrders"" select 1;" \n
+                                         "_height = _veh getVariable ""TOUR_SI_heliOrders"" select 2;" \n
+                                         "_radiusCas = _veh getVariable ""TOUR_SI_heliOrders"" select 3;" \n
+                                         "_speed = _veh getVariable ""TOUR_SI_heliOrders"" select 4;" \n
+                                         "_behaviour = _veh getVariable ""TOUR_SI_heliOrders"" select 5;" \n
+                                         "_chopper setVariable [""TOUR_SI_heliOrders"", nil, true];" \n
+                                         "_chopper setVariable [""TOUR_SI_CAS_Laser"", nil];" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+        };
+        initState="react";
+        finalStates[] =
+        {
+                "end1",
+        };
+};
+/*%FSM</COMPILE>*/

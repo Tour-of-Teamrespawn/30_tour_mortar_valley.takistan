@@ -1,0 +1,264 @@
+﻿/*
+     a2s_friendlyerror.sqh
+        Collection of user-friendly error handing functions.
+	 Version: 0.1.1
+     URL: http://code.google.com/p/a2script/
+     License: Creative Commons Attribution Share Alike (http://creativecommons.org/licenses/by-sa/3.0/)
+	 
+     USAGE:
+	    #include to your script. See the individual functions for details.
+*/
+
+
+/*
+	Display and/or log an error message.
+		<NIL> = [error, (showHint), (doLog)] call A2S_friendlyError_alert;
+				- error    = Error message to display. Use | for line breaks. <STRING>
+				- showHint = (Optional) Show error message with hintC, default is TRUE. <BOOL>
+				- doLog    = (Optional) Log the error message to arma2(oa).RPT, default is TRUE. <BOOL>
+		Example:
+			["ERROR IN ExampleFnc|Value must be greater than 0"] call A2S_friendlyError_alert;
+*/
+A2S_friendlyError_alert =
+{
+	private ["_msg", "_hintc", "_log"];
+	_msg = _this select 0;
+	_hintc = if (count _this > 1) then {_this select 1} else {true};
+	_log = if (count _this > 2) then {_this select 2} else {true};
+	
+	_splitLines = //Split into lines by |
+	{
+		private ["_chars", "_lines", "_line"];
+		_chars = toArray(_this);
+		_lines = [""];
+		_line = 0;
+		for "_i" from 0 to (count _chars)-1 do
+		{
+			if (toString[_chars select _i] == "|") then
+			{
+				_line = _line + 1;
+				_lines set [_line, ""];
+			}
+			else
+			{
+				_lines set [_line, format["%1%2", _lines select _line, toString[_chars select _i]]];
+			};
+		};
+		
+		_lines
+	};
+	
+	private "_hintTxt";
+	_hintTxt = "";
+	{
+		if (_hintc) then
+		{
+			_hintTxt = format["%1\n%2", _hintTxt, _x];
+		};
+		if (_log) then
+		{
+			diag_log text _x;
+		};
+	} forEach (_msg call _splitLines);
+	
+	if (_hintc) then
+	{
+		hintC _hintTxt;
+	};
+};
+
+
+/*
+	Check if supplied input parameters' type names match the mask
+		<BOOL> = [function, parameters, mask, (doAltert), (lenghtStrict)] call A2S_friendlyError_paramsMatch;
+				- function     = Name of the function. <STRING>
+				- parameters   = Parameters passed on to the function. (its _this variable) <ANY>
+				- mask         = Type name mask. <STRING> OR <ARRAY STRING>
+				- doAlert      = (Optional) Log error to RPT and display an error message, default is TRUE. <BOOL>
+				- lenghtStrict = (Optional) Require the EXACT number of elements in arrays. If FALSE extra elements over the mask will NOT be considered an error. Default is TRUE. <BOOL>
+			Return: TRUE if matches, FALSE otherwise
+			
+		Example:
+			["ExampleFnc", _this, ["STRING", "STRING", ["SCALAR", "BOOL"]]] call A2S_friendlyError_paramsMatch;
+*/
+A2S_friendlyError_paramsMatch =
+{
+	private ["_function", "_params", "_types", "_alert", "_lenghtStrict", "_error", "_expected", "_encountered"];
+	
+	_function = _this select 0;
+	_alert = if (count _this >= 4) then {_this select 3} else {true};
+	_lenghtStrict = if (count _this == 5) then {_this select 4} else {true}; //Require EXACT number of parameters in arrays. If FALSE extra params will NOT be considered an error
+	
+	_error = true;
+	
+	private "_composeArrayTypes";
+	_composeArrayTypes =
+	{
+		private ["_array", "_types"];
+		_array = _this;
+		
+		_types = [];
+		for "_i" from 0 to (count _array)-1 do
+		{
+			if (isNil {_array select _i}) then
+			{
+				_types set [count _types, "NIL"];
+			}
+			else
+			{
+				if (typeName(_array select _i) != "ARRAY") then
+				{
+					_types set [count _types, typeName(_array select _i)];
+				}
+				else
+				{
+					_types set [count _types, (_array select _i) call _composeArrayTypes];
+				};
+			};
+		};
+		
+		_types
+	};
+	
+	private "_compareArrayTypes";
+	_compareArrayTypes =
+	{
+		private ["_whatArray", "_againstArray", "_lenghtStrict", "_return"];
+		_whatArray = _this select 0;
+		_againstArray = _this select 1;
+		_lenghtStrict = _this select 2;
+		
+		_return = true;
+		
+		if (!((count _whatArray == count _againstArray) || (!_lenghtStrict && (count _whatArray >= count _againstArray)))) then
+		{
+			_return = false;
+		}
+		else
+		{
+			private ["_what", "_against"];
+			
+			for "_i" from 0 to (count _againstArray)-1 do
+			{
+				if (!isNil {_whatArray select _i} && !isNil {_againstArray select _i}) then
+				{
+					_what = _whatArray select _i;
+					_against = _againstArray select _i;
+					
+					if (typeName _what == "ARRAY" && typeName _against == "ARRAY") then
+					{
+						_return = ([_what, _against, _lenghtStrict] call _compareArrayTypes);
+					}
+					else
+					{
+						if (typeName _what != _against) then
+						{
+							_return = false;
+						}
+					};
+				}
+				else
+				{
+					if (!(isNil {_whatArray select _i} && isNil {_againstArray select _i})) then
+					{
+						_return = false;
+					};
+				};
+			};
+		};
+		
+		_return
+	};
+	
+	_typesToList =
+	{
+		private ["_types", "_first", "_txt"];
+		_types = _this;
+		
+		_first = true;
+		_txt = "[";
+		for "_i" from 0 to (count _types)-1 do
+		{
+			if (_first) then
+			{
+				_first = false;
+			}
+			else
+			{
+				_txt = _txt + ",";
+			};
+			
+			if (typeName(_types select _i) == "STRING") then
+			{
+				_txt = format["%1<%2>", _txt, toUpper(_types select _i)];
+			}
+			else // Nested array
+			{
+				_txt = _txt + ((_types select _i) call _typesToList);
+			};
+		};
+		
+		_txt = _txt + "]";
+		_txt
+	};
+	
+	if (isNil {_this select 1}) then
+	{
+		_encountered = "Encountered: <NIL>";
+		if (typeName _types == "STRING") then
+		{
+			_expected = format["Expected: <%1>", toUpper (_types)];
+		}
+		else
+		{
+			_expected = _types call _typesToList;
+		};
+	}
+	else
+	{
+		_params = _this select 1;
+		_types = _this select 2;
+	
+		if (typeName _params == "STRING" || typeName _types == "STRING") then
+		{
+			if (typeName _params != typeName _types) then
+			{
+				_expected = format["Expected: <%1>", toUpper (typeName _types)];
+				_encountered = format["Encountered: <%2>", toUpper (typeName _params)];
+			}
+			else
+			{
+				_error = false;
+			};
+		}
+		else
+		{
+			if (typeName _types == "ARRAY") then
+			{
+				if (!([_params, _types, _lenghtStrict] call _compareArrayTypes)) then
+				{
+					_expected = _types call _typesToList;
+					_encountered = ((_params call _composeArrayTypes) call _typesToList);
+				}
+				else
+				{
+					_error = false;
+				};
+			};
+		};
+	};
+	
+	if (_error) then
+	{
+		if (_alert) then
+		{
+			[format["WRONG INPUT PARAMETER(S) FOR %1!|    Expected:    %2|    Encountered: %3", _function, _expected, _encountered]] call A2S_friendlyError_alert;
+		};
+		
+		false
+	}
+	else
+	{
+		true
+	};
+};

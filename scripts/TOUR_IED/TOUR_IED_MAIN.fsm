@@ -1,0 +1,194 @@
+/*%FSM<COMPILE "scriptedFSM.cfg, main">*/
+/*%FSM<HEAD>*/
+/*
+item0[] = {"_",2,250,45.000000,-75.000000,60.000000,-60.000000,0.000000,""};
+item1[] = {"Player_alive",4,218,300.000000,0.000000,390.000000,45.000000,0.000000,"Player alive"};
+item2[] = {"Start",0,250,15.000000,-330.000000,120.000000,-285.000000,0.000000,"Start"};
+item3[] = {"__1",2,250,270.000000,90.000000,285.000000,105.000000,0.000000,""};
+item4[] = {"close",4,4314,-120.000000,15.000000,-30.000000,60.000000,0.000000,"close"};
+item5[] = {"__2",2,250,-75.000000,150.000000,-60.000000,165.000000,0.000000,""};
+item6[] = {"Bombs_are_presen",4,218,-15.000000,120.000000,105.000000,195.000000,1.000000,"Bombs are present"};
+item7[] = {"not_close",8,218,15.000000,30.000000,105.000000,75.000000,0.000000,"not close"};
+item8[] = {"bomb_not_present",8,218,135.000000,0.000000,240.000000,75.000000,0.000000,"bomb not present" \n ""};
+item9[] = {"isdedicated",4,218,75.000000,-255.000000,165.000000,-210.000000,0.000000,"isdedicated"};
+item10[] = {"Exit",1,250,255.000000,-240.000000,345.000000,-195.000000,0.000000,"Exit"};
+item11[] = {"Not_dedicated",8,218,0.000000,-180.000000,90.000000,-135.000000,0.000000,"Not dedicated"};
+link0[] = {0,1};
+link1[] = {1,3};
+link2[] = {2,9};
+link3[] = {2,11};
+link4[] = {3,6};
+link5[] = {3,8};
+link6[] = {4,0};
+link7[] = {5,4};
+link8[] = {5,7};
+link9[] = {6,5};
+link10[] = {7,0};
+link11[] = {8,0};
+link12[] = {9,10};
+link13[] = {11,0};
+globals[] = {0.000000,0,0,0,0,640,480,2,87,6316128,1,-208.845917,446.800049,364.929749,-414.706573,698,830,1};
+window[] = {0,-1,-1,-1,-1,1184,182,1612,182,1,716};
+*//*%FSM</HEAD>*/
+class FSM
+{
+        fsmName = "main";
+        class States
+        {
+                /*%FSM<STATE "_">*/
+                class _
+                {
+                        name = "_";
+                        itemno = 0;
+                        init = /*%FSM<STATEINIT""">*/""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "Player_alive">*/
+                                class Player_alive
+                                {
+                                        itemno = 1;
+                                        priority = 0.000000;
+                                        to="__1";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"alive player"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "Start">*/
+                class Start
+                {
+                        name = "Start";
+                        itemno = 2;
+                        init = /*%FSM<STATEINIT""">*/"if (!isDedicated) then" \n
+                         "{" \n
+                         "	private [""_bombs"",""_bomb""];" \n
+                         "	TOUR_IED_defuseStart = false;" \n
+                         "	TOUR_IED_action = false;" \n
+                         "	player addAction [""<t color=""""#FF0000"""">"" +""Defuse"", ""scripts\TOUR_IED\bombdefuse.sqf"", 0, 10, true, false, """", ""TOUR_IED_action""];" \n
+                         "	player addEventHandler [""RESPAWN"", {player addAction [""<t color=""""#FF0000"""">"" +""Defuse"", ""scripts\TOUR_IED\bombdefuse.sqf"", 0, 10, true, false, """", ""TOUR_IED_action""];}];" \n
+                         "};"/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "Not_dedicated">*/
+                                class Not_dedicated
+                                {
+                                        itemno = 11;
+                                        priority = 0.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "isdedicated">*/
+                                class isdedicated
+                                {
+                                        itemno = 9;
+                                        priority = 0.000000;
+                                        to="Exit";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"isDedicated"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "__1">*/
+                class __1
+                {
+                        name = "__1";
+                        itemno = 3;
+                        init = /*%FSM<STATEINIT""">*/"_bombs = nearestObjects [vehicle player, [""IEDLandBig_F"",""IEDLandSmall_F"",""IEDUrbanBig_F"",""IEDUrbanSmall_F""],100];" \n
+                         "" \n
+                         ""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "Bombs_are_presen">*/
+                                class Bombs_are_presen
+                                {
+                                        itemno = 6;
+                                        priority = 1.000000;
+                                        to="__2";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"(count _bombs > 0)" \n
+                                         ""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"_bomb = _bombs select 0;" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "bomb_not_present">*/
+                                class bomb_not_present
+                                {
+                                        itemno = 8;
+                                        priority = 0.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"TOUR_IED_action = false;"/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "__2">*/
+                class __2
+                {
+                        name = "__2";
+                        itemno = 5;
+                        init = /*%FSM<STATEINIT""">*/""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                                /*%FSM<LINK "not_close">*/
+                                class not_close
+                                {
+                                        itemno = 7;
+                                        priority = 0.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/""/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"TOUR_IED_action = false;"/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                                /*%FSM<LINK "close">*/
+                                class close
+                                {
+                                        itemno = 4;
+                                        priority = 0.000000;
+                                        to="_";
+                                        precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+                                        condition=/*%FSM<CONDITION""">*/"(player distance _bomb < 2)&& (_bomb getVariable ""TOUR_IED_bombActive"")&&(""ACE_DefusalKit"" in (items player))"/*%FSM</CONDITION""">*/;
+                                        action=/*%FSM<ACTION""">*/"TOUR_IED_action = true;" \n
+                                         ""/*%FSM</ACTION""">*/;
+                                };
+                                /*%FSM</LINK>*/
+                        };
+                };
+                /*%FSM</STATE>*/
+                /*%FSM<STATE "Exit">*/
+                class Exit
+                {
+                        name = "Exit";
+                        itemno = 10;
+                        init = /*%FSM<STATEINIT""">*/""/*%FSM</STATEINIT""">*/;
+                        precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+                        class Links
+                        {
+                        };
+                };
+                /*%FSM</STATE>*/
+        };
+        initState="Start";
+        finalStates[] =
+        {
+                "Exit",
+        };
+};
+/*%FSM</COMPILE>*/
