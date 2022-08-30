@@ -4,7 +4,7 @@
 # Tour (proposed) mission naming standard like:
 #   "30 [Tour] MISSION NAME v1.1"
 #   "30 [Tour] Operation Bitemark v1.0"
-$MissionName_withV = "30[Tour] Mortar Valley v"
+$MissionName_withV = "30 [Tour] Mortar Valley v"
 
 ###################################################################################################
 

@@ -6,8 +6,8 @@ class Header
 };
 
 author = "Mr.Ben";
-onLoadName = "30 [TOUR] Mortar Valley v"; 
-briefingName = "30 [TOUR] Mortar Valley v";
+onLoadName = "30 [Tour] Mortar Valley v2.2"; 
+briefingName = "30 [Tour] Mortar Valley v2.2";
 onLoadMission = "Eliminate Those Damn Mortar Positions!";
 onLoadMissionTime = true;
 overviewPicture = "";
